@@ -3,6 +3,7 @@ var X_AXIS = 2;
 var canvasWidth = 500;
 var canvasHeight = 600;
 var heightScale = 0.5;
+var frmrate = 30;
 
 var attention_values  = [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ];
 var attention_helpers = [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ];
@@ -23,44 +24,29 @@ function receiveOsc(address, value)
 	console.log("received OSC: " + address + ", " + value);
   if (address == '/mindwave/attention')
   {
-      for (var i=0; i<(attention_values.length-1);++i)
-      {
-        attention_values[i] = attention_values[i+1];
-      }
-      attention_values[attention_values.length-1] = value;
+      attention_values.shift();
+      attention_values.push(value);
   }
 	else if (address == '/mindwave/meditation')
 	{
-		for (var i=0; i<(meditation_values.length-1);++i)
-		{
-			meditation_values[i] = meditation_values[i+1];
-		}
-		meditation_values[meditation_values.length-1] = value;
+        meditation_values.shift();
+        meditation_values.push(value);
 	}
 	else if (address == '/mindwave/raw')
 	{
-		for (var i=0; i<(raw_values.length-1);++i)
-		{
-			raw_values[i] = raw_values[i+1];
-		}
-		raw_values[raw_values.length-1] = value;
+        raw_values.shift();
+        raw_values.push(value);
 	}
 	else if (address == '/mindwave/eyeblink')
 	{
-		for (var i=0; i<(eyeblink_values.length-1);++i)
-		{
-			eyeblink_values[i] = eyeblink_values[i+1];
-		}
-		eyeblink_values[eyeblink_values.length-1] = 100;
+        eyeblink_values.shift()
+        eyeblink_values.push(100);
 	}
 
 	if (address != '/mindwave/eyeblink' && address != '/mindwave/raw')
 	{
-		for (var i=0; i<(eyeblink_values.length-1);++i)
-		{
-			eyeblink_values[i] = eyeblink_values[i+1];
-		}
-		eyeblink_values[eyeblink_values.length-1] = 0;
+        eyeblink_values.shift();
+        eyeblink_values.push(0);
 	}
 }
 
@@ -173,6 +159,7 @@ function barGraph(originx, originy, values, helpers, width, spacing, bottomcolor
 function setup()
 {
     createCanvas(canvasWidth, canvasHeight);
+    frameRate(frmrate);
     background(30, 30, 30);
     setupOsc(3333,3334);
 }
@@ -194,41 +181,41 @@ function draw()
   barGraph((canvasWidth - (attention_values.length)*(spacing+width))/2.0,
            canvasHeight/4.0, //(canvasHeight - (max(values)-min(values)))/2.0+max(values),
            attention_values,
-					 attention_helpers,
+		   attention_helpers,
            width,
            spacing,
            color(218, 165, 32), // yellowish
            color(72, 61, 139),  // blueish
-           0.2);
+           0.2*(30.0/frmrate));
 
 	 barGraph((canvasWidth - (meditation_values.length)*(spacing+width))/2.0,
             2*canvasHeight/4.0, //(canvasHeight - (max(values)-min(values)))/2.0+max(values),
             meditation_values,
-  					meditation_helpers,
+  			meditation_helpers,
             width,
             spacing,
             color(255, 176, 59), // light brown
             color(182, 73, 38),  // darker brown
-            0.2);
+            0.2*(30.0/frmrate));
 
 	 barGraph((canvasWidth - (raw_values.length)*(spacing+width/4.0))/2.0,
             3*canvasHeight/4.0, //(canvasHeight - (max(values)-min(values)))/2.0+max(values),
             raw_values,
-	  				raw_helpers,
+	  		raw_helpers,
             width/4.0,
             spacing,
             color(0, 255, 0), // green
             color(255, 0, 0),  // red
-            0.2);
+            0.2*(30.0/frmrate));
 
 	 barGraph((canvasWidth - (eyeblink_values.length)*(spacing+width*8))/2.0,
-		 	      4*canvasHeight/4.0,
-						eyeblink_values,
-						eyeblink_helpers,
-						width*8,
-						spacing,
-						color(88, 0, 9), // dark red
-						color(240, 60, 125), // pink
-						0.3);
+		 	4*canvasHeight/4.0,
+			eyeblink_values,
+			eyeblink_helpers,
+			width*8,
+			spacing,
+			color(88, 0, 9), // dark red
+			color(240, 60, 125), // pink
+			0.3*(30.0/frmrate));
 
 }
