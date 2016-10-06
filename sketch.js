@@ -12,7 +12,7 @@ var meditation_values  = [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ];
 var meditation_helpers = [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ];
 
 var raw_values  = [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-	                   0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ];
+                     0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ];
 var raw_helpers = [  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
                      0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ];
 
@@ -21,58 +21,58 @@ var eyeblink_helpers = [ 0 ];
 
 function receiveOsc(address, value)
 {
-	console.log("received OSC: " + address + ", " + value);
+  console.log("received OSC: " + address + ", " + value);
   if (address == '/mindwave/attention')
   {
       attention_values.shift();
       attention_values.push(value);
   }
-	else if (address == '/mindwave/meditation')
-	{
+  else if (address == '/mindwave/meditation')
+  {
         meditation_values.shift();
         meditation_values.push(value);
-	}
-	else if (address == '/mindwave/raw')
-	{
+  }
+  else if (address == '/mindwave/raw')
+  {
         raw_values.shift();
         raw_values.push(value);
-	}
-	else if (address == '/mindwave/eyeblink')
-	{
+  }
+  else if (address == '/mindwave/eyeblink')
+  {
         eyeblink_values.shift()
         eyeblink_values.push(100);
-	}
+  }
 
-	if (address != '/mindwave/eyeblink' && address != '/mindwave/raw')
-	{
+  if (address != '/mindwave/eyeblink' && address != '/mindwave/raw')
+  {
         eyeblink_values.shift();
         eyeblink_values.push(0);
-	}
+  }
 }
 
 function sendOsc(address, value)
 {
-	socket.emit('message', [address].concat(value));
+  socket.emit('message', [address].concat(value));
 }
 
 function setupOsc(oscPortIn, oscPortOut)
 {
-	var socket = io.connect('http://127.0.0.1', { port: 8081, rememberTransport: false });
-	socket.on('connect', function() {
-		socket.emit('config', {
-			server: { port: oscPortIn,  host: '127.0.0.1'},
-			client: { port: oscPortOut, host: '127.0.0.1'}
-		});
-	});
-	socket.on('message', function(msg) {
-		if (msg[0] == '#bundle') {
-			for (var i=2; i<msg.length; i++) {
-				receiveOsc(msg[i][0], msg[i].splice(1));
-			}
-		} else {
-			receiveOsc(msg[0], msg.splice(1));
-		}
-	});
+  var socket = io.connect('http://127.0.0.1', { port: 8081, rememberTransport: false });
+  socket.on('connect', function() {
+    socket.emit('config', {
+      server: { port: oscPortIn,  host: '127.0.0.1'},
+      client: { port: oscPortOut, host: '127.0.0.1'}
+    });
+  });
+  socket.on('message', function(msg) {
+    if (msg[0] == '#bundle') {
+      for (var i=2; i<msg.length; i++) {
+        receiveOsc(msg[i][0], msg[i].splice(1));
+      }
+    } else {
+      receiveOsc(msg[0], msg.splice(1));
+    }
+  });
 }
 
 function setGradient(x, y, w, h, c1, c2, axis)
@@ -166,56 +166,56 @@ function setup()
 
 function draw()
 {
-	background(30, 30, 30);
+  background(30, 30, 30);
 
   var width = 20;
   var spacing = 3;
 
-	textSize(32);
+  textSize(32);
   fill(0, 102, 153);
   text("attention", 10, 60);
-	text("meditation", 10, canvasHeight/4.0 + 60);
-	text("raw", 10, 2*canvasHeight/4.0 + 60);
-	text("eyeblink", 10, 3*canvasHeight/4.0 + 60);
+  text("meditation", 10, canvasHeight/4.0 + 60);
+  text("raw", 10, 2*canvasHeight/4.0 + 60);
+  text("eyeblink", 10, 3*canvasHeight/4.0 + 60);
 
   barGraph((canvasWidth - (attention_values.length)*(spacing+width))/2.0,
            canvasHeight/4.0, //(canvasHeight - (max(values)-min(values)))/2.0+max(values),
            attention_values,
-		   attention_helpers,
+           attention_helpers,
            width,
            spacing,
            color(218, 165, 32), // yellowish
            color(72, 61, 139),  // blueish
            0.2*(30.0/frmrate));
 
-	 barGraph((canvasWidth - (meditation_values.length)*(spacing+width))/2.0,
+   barGraph((canvasWidth - (meditation_values.length)*(spacing+width))/2.0,
             2*canvasHeight/4.0, //(canvasHeight - (max(values)-min(values)))/2.0+max(values),
             meditation_values,
-  			meditation_helpers,
+            meditation_helpers,
             width,
             spacing,
             color(255, 176, 59), // light brown
             color(182, 73, 38),  // darker brown
             0.2*(30.0/frmrate));
 
-	 barGraph((canvasWidth - (raw_values.length)*(spacing+width/4.0))/2.0,
+   barGraph((canvasWidth - (raw_values.length)*(spacing+width/4.0))/2.0,
             3*canvasHeight/4.0, //(canvasHeight - (max(values)-min(values)))/2.0+max(values),
             raw_values,
-	  		raw_helpers,
+            raw_helpers,
             width/4.0,
             spacing,
             color(0, 255, 0), // green
             color(255, 0, 0),  // red
             0.2*(30.0/frmrate));
 
-	 barGraph((canvasWidth - (eyeblink_values.length)*(spacing+width*8))/2.0,
-		 	4*canvasHeight/4.0,
-			eyeblink_values,
-			eyeblink_helpers,
-			width*8,
-			spacing,
-			color(88, 0, 9), // dark red
-			color(240, 60, 125), // pink
-			0.3*(30.0/frmrate));
+   barGraph((canvasWidth - (eyeblink_values.length)*(spacing+width*8))/2.0,
+            4*canvasHeight/4.0,
+            eyeblink_values,
+            eyeblink_helpers,
+            width*8,
+            spacing,
+            color(88, 0, 9), // dark red
+            color(240, 60, 125), // pink
+            0.3*(30.0/frmrate));
 
 }
